@@ -267,4 +267,24 @@ class ApiService {
     }
     throw Exception('Falha ao transcrever áudio');
   }
+
+  // --- Account Management ---
+
+  Future<Map<String, dynamic>> resetUserData() async {
+    return await _request('/account/reset', method: 'POST');
+  }
+
+  Future<Map<String, dynamic>> deleteAccount() async {
+    return await _request('/account/delete', method: 'DELETE');
+  }
+
+  // --- Plans ---
+
+  Future<List<dynamic>> getPlans() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/plans'),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Falha ao obter planos');
+  }
 }
