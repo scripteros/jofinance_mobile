@@ -115,11 +115,6 @@ class MentoriaTabState extends State<MentoriaTab> {
       'time': '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
     };
 
-    final historyParam = _messages.reversed.map((m) => {
-      'role': m['isUser'] ? 'user' : 'model',
-      'content': m['text']
-    }).toList();
-
     setState(() {
       _messages.insert(0, userMsg);
       _controller.clear();
@@ -127,11 +122,9 @@ class MentoriaTabState extends State<MentoriaTab> {
     });
     _scrollToBottom();
 
-    final textToSend = '$text\n\n[Regra do Sistema: Identifique a intenção: se for RECEITA/GANHO, action.type="income_registered". Se for GASTO/COMPRA, action.type="expense_registered". Se for criar uma META/OBJETIVO, action.type="goal_created". Não confunda meta com gasto!]';
-
     try {
 
-      final response = await _apiService.sendChatMessage(textToSend, historyParam);
+      final response = await _apiService.sendChatMessage(text);
       final aiResponseText = response['response'] ?? 'Não entendi.';
 
       setState(() {
@@ -145,27 +138,6 @@ class MentoriaTabState extends State<MentoriaTab> {
       _scrollToBottom();
       
       if (response['action'] != null) {
-        final action = response['action'];
-        final actionType = action['type'];
-        final actionData = action['data'];
-        
-        if (actionType == 'goal_created' && actionData != null) {
-          final targetAmount = actionData['target_amount'];
-          await _apiService.createGoal(
-            title: actionData['name'] ?? 'Nova meta',
-            targetAmount: targetAmount is num ? targetAmount.toDouble() : double.tryParse(targetAmount.toString()) ?? 0.0,
-            currentAmount: 0,
-          );
-        } else if ((actionType == 'income_registered' || actionType == 'expense_registered') && actionData != null) {
-          final amount = actionData['amount'];
-          await _apiService.createTransaction(
-            description: actionData['description'] ?? (actionType == 'income_registered' ? 'Receita' : 'Gasto'),
-            amount: amount is num ? amount.toDouble() : double.tryParse(amount.toString()) ?? 0.0,
-            category: actionType == 'income_registered' ? 'Receita' : 'Outros',
-            type: actionType == 'income_registered' ? 'income' : 'expense',
-          );
-        }
-        
         widget.onRefresh?.call();
       }
     } catch (e) {

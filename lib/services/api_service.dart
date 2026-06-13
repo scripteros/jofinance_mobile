@@ -152,18 +152,19 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> createGoal({
-    required String title,
+    required String name,
     required double targetAmount,
-    required double currentAmount,
+    required String category,
+    double monthlyContribution = 0,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/goals'),
       headers: await _getHeaders(),
       body: jsonEncode({
-        'title': title,
+        'name': name,
         'target_amount': targetAmount,
-        'current_amount': currentAmount,
-        'type': 'saving',
+        'category': category,
+        'monthly_contribution': monthlyContribution,
       }),
     );
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -212,11 +213,11 @@ class ApiService {
     return [];
   }
 
-  Future<Map<String, dynamic>> sendChatMessage(String message, List<Map<String, dynamic>> history) async {
+  Future<Map<String, dynamic>> sendChatMessage(String message) async {
     final response = await http.post(
       Uri.parse('$baseUrl/chat'),
       headers: await _getHeaders(),
-      body: jsonEncode({'message': message, 'history': history}),
+      body: jsonEncode({'message': message}),
     );
     if (response.statusCode == 200 || response.statusCode == 201) return jsonDecode(response.body);
     throw Exception('Falha ao enviar mensagem');

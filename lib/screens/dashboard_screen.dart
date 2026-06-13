@@ -113,11 +113,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final List<Goal> goalsData = goalsDataRaw.map((gp) {
         return Goal(
           id: (gp['goal_id'] is num) ? (gp['goal_id'] as num).toInt() : (int.tryParse(gp['goal_id']?.toString() ?? '0') ?? 0),
-          title: gp['title'] ?? '',
+          name: gp['name']?.toString() ?? gp['title']?.toString() ?? '',
           targetAmount: parseDouble(gp['target_amount']),
           currentAmount: parseDouble(gp['current_amount']),
           percentage: parseDouble(gp['percentage']),
-          type: 'custom',
+          category: gp['category']?.toString() ?? 'saving',
+          status: gp['status']?.toString() ?? 'ativo',
         );
       }).toList();
 

@@ -78,20 +78,24 @@ class Transaction {
 
 class Goal {
   final int id;
-  final String title;
+  final String name;
   final double targetAmount;
   final double currentAmount;
   final double percentage;
-  final String type;
+  final String category;
+  final String status;
+  final double monthlyContribution;
   final String? dueDate;
 
   Goal({
     required this.id,
-    required this.title,
+    required this.name,
     required this.targetAmount,
     required this.currentAmount,
     required this.percentage,
-    required this.type,
+    required this.category,
+    required this.status,
+    this.monthlyContribution = 0,
     this.dueDate,
   });
 
@@ -108,12 +112,14 @@ class Goal {
     }
     return Goal(
       id: parseInt(json['id']),
-      title: json['title']?.toString() ?? '',
+      name: json['name']?.toString() ?? json['title']?.toString() ?? '',
       targetAmount: parseDouble(json['target_amount']),
       currentAmount: parseDouble(json['current_amount']),
       percentage: parseDouble(json['percentage']),
-      type: json['type']?.toString() ?? '',
-      dueDate: json['due_date']?.toString(),
+      category: json['category']?.toString() ?? 'saving',
+      status: json['status']?.toString() ?? 'ativo',
+      monthlyContribution: parseDouble(json['monthly_contribution']),
+      dueDate: json['target_date']?.toString() ?? json['due_date']?.toString(),
     );
   }
 }

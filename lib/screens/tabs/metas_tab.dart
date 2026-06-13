@@ -101,9 +101,9 @@ class MetasTab extends StatelessWidget {
                             setModalState(() => _isLoading = true);
                             try {
                               await _apiService.createGoal(
-                                title: title,
+                                name: title,
                                 targetAmount: target,
-                                currentAmount: current,
+                                category: catController.text,
                               );
                               if (ctx.mounted) {
                                 Navigator.pop(ctx);
@@ -240,7 +240,7 @@ class MetasTab extends StatelessWidget {
                 ...goals.map((g) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: GoalCard(
-                    title: g.title,
+                    title: g.name,
                     percentage: g.percentage,
                     currentAmountText: 'R\$ ${g.currentAmount.toStringAsFixed(2)}',
                     targetAmountText: 'R\$ ${g.targetAmount.toStringAsFixed(2)}',

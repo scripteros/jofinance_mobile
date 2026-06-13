@@ -661,7 +661,7 @@ class _DashboardTabState extends State<DashboardTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(goal.title, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(goal.name, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 8),
                         Text('R\$ ${goal.currentAmount.toStringAsFixed(2)} / R\$ ${goal.targetAmount.toStringAsFixed(2)}', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600)),
                         const Spacer(),
