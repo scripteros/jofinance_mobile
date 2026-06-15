@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "781584949627",
+    "project_id": "jofinance-b0f1c",
+    "storage_bucket": "jofinance-b0f1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781584949627:android:2201e1c2bce63cfb735dde",
+        "android_client_info": {
+          "package_name": "br.com.mobap.jo_finance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDghAmDRlin4pXYxxOybr8AMyRu7jQ0i0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

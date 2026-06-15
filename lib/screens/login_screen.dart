@@ -97,7 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final bool didAuthenticate = await _localAuth.authenticate(
         localizedReason: 'Use sua biometria para acessar a conta',
-        biometricOnly: true,
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
       );
 
       if (didAuthenticate && mounted) {
@@ -176,213 +179,215 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1280),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isDesktop = constraints.maxWidth > 800;
-                    return Flex(
-                      direction: isDesktop ? Axis.horizontal : Axis.vertical,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Left Side: Visual/Branding
-                        if (isDesktop)
-                          Expanded(
-                            flex: 6,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.primary.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(16),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1280),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isDesktop = constraints.maxWidth > 800;
+                      return Flex(
+                        direction: isDesktop ? Axis.horizontal : Axis.vertical,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Left Side: Visual/Branding (desktop only)
+                          if (isDesktop)
+                            Expanded(
+                              flex: 6,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.primary.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: Icon(Icons.rocket_launch, color: colorScheme.primary, size: 32),
                                       ),
-                                      child: Icon(Icons.rocket_launch, color: colorScheme.primary, size: 32),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Text('Josi Finanças', style: GoogleFonts.outfit(fontSize: 48, fontWeight: FontWeight.bold, color: textColor, letterSpacing: -1)),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                Text('Transforme sua relação com o dinheiro através de uma gestão sofisticada, clara e empoderada.', style: GoogleFonts.inter(fontSize: 18, color: subtitleColor, height: 1.6)),
-                                const SizedBox(height: 48),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
-                                    boxShadow: [BoxShadow(color: colorScheme.primary.withValues(alpha: 0.1), blurRadius: 40, offset: const Offset(0, 10))],
+                                      const SizedBox(width: 16),
+                                      Text('Josi Finanças', style: GoogleFonts.outfit(fontSize: 48, fontWeight: FontWeight.bold, color: textColor, letterSpacing: -1)),
+                                    ],
                                   ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: AspectRatio(
-                                    aspectRatio: 4/3,
-                                    child: Image.network(
-                                      'https://lh3.googleusercontent.com/aida-public/AB6AXuCCHRuVvI6vAIGwqrrh4U3_gRyYb9vLbcMEv9VzFAnHqMri64mG1pWqv8KR2cXfKAY04yt1pUtsCCnjUVmxpQO9AMcsPqpWWX_xWCdesQ94EYFfiCZ1elM0naADJSKO5vb56ulaGG2qTdecscFNlsEtu50_pgmfTnhIjKtgCvFOgjnMUZM-EAzcOzGvqaGr1zgY-y6X03qFyBuWegATxZGZEimWSC5XWIpen6AMYvvmkJlK9bMSRDV5kJkIWX4ArM1iM2CqB3LFCyFL',
-                                      fit: BoxFit.cover,
+                                  const SizedBox(height: 24),
+                                  Text('Transforme sua relação com o dinheiro através de uma gestão sofisticada, clara e empoderada.', style: GoogleFonts.inter(fontSize: 18, color: subtitleColor, height: 1.6)),
+                                  const SizedBox(height: 48),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(24),
+                                      border: Border.all(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
+                                      boxShadow: [BoxShadow(color: colorScheme.primary.withValues(alpha: 0.1), blurRadius: 40, offset: const Offset(0, 10))],
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: AspectRatio(
+                                      aspectRatio: 4/3,
+                                      child: Image.network(
+                                        'https://lh3.googleusercontent.com/aida-public/AB6AXuCCHRuVvI6vAIGwqrrh4U3_gRyYb9vLbcMEv9VzFAnHqMri64mG1pWqv8KR2cXfKAY04yt1pUtsCCnjUVmxpQO9AMcsPqpWWX_xWCdesQ94EYFfiCZ1elM0naADJSKO5vb56ulaGG2qTdecscFNlsEtu50_pgmfTnhIjKtgCvFOgjnMUZM-EAzcOzGvqaGr1zgY-y6X03qFyBuWegATxZGZEimWSC5XWIpen6AMYvvmkJlK9bMSRDV5kJkIWX4ArM1iM2CqB3LFCyFL',
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        if (isDesktop) const Spacer(flex: 1),
-                        
-                        // Right Side: Form
-                        Expanded(
-                          flex: isDesktop ? 5 : 0,
-                          child: Container(
-                            padding: EdgeInsets.all(isDesktop ? 48 : 32),
-                            decoration: BoxDecoration(
-                              color: surfaceColor,
-                              borderRadius: BorderRadius.circular(32),
-                              border: Border.all(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
-                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 40, offset: const Offset(0, 10))],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-                              children: [
-                                if (!isDesktop)
+                          if (isDesktop) const Spacer(flex: 1),
+                          
+                          // Right Side: Form
+                          Expanded(
+                            flex: isDesktop ? 5 : 0,
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(
+                                isDesktop ? 48 : 24,
+                                isDesktop ? 48 : 28,
+                                isDesktop ? 48 : 24,
+                                isDesktop ? 48 : 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: surfaceColor,
+                                borderRadius: BorderRadius.circular(32),
+                                border: Border.all(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
+                                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 40, offset: const Offset(0, 10))],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isDesktop)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: colorScheme.primary.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Icon(Icons.rocket_launch, color: colorScheme.primary, size: 24),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text('Josi Finanças', style: GoogleFonts.outfit(fontSize: 26, fontWeight: FontWeight.bold, color: textColor)),
+                                      ],
+                                    ),
+                                  if (!isDesktop) const SizedBox(height: 20),
+                                  Text(isDesktop ? 'Bem-vinda de volta' : 'Bem-vinda', style: GoogleFonts.outfit(fontSize: isDesktop ? 32 : 26, fontWeight: FontWeight.bold, color: textColor)),
+                                  const SizedBox(height: 4),
+                                  Text('Acesse sua conta para continuar.', style: GoogleFonts.inter(fontSize: 15, color: subtitleColor), textAlign: isDesktop ? TextAlign.left : TextAlign.center),
+                                  const SizedBox(height: 28),
+                                  
+                                  _buildInput(label: 'E-mail', icon: Icons.mail_outline_rounded, hint: 'exemplo@email.com', controller: _emailController, keyboardType: TextInputType.emailAddress, isDark: isDark, colorScheme: colorScheme),
+                                  const SizedBox(height: 16),
+                                  _buildInput(
+                                    label: 'Senha',
+                                    icon: Icons.lock_outline_rounded,
+                                    hint: '••••••••',
+                                    controller: _passwordController,
+                                    obscure: _obscurePassword,
+                                    isDark: isDark,
+                                    colorScheme: colorScheme,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: subtitleColor),
+                                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                    ),
+                                    labelExtra: TextButton(
+                                      onPressed: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
+                                      },
+                                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                      child: Text('Esqueci', style: GoogleFonts.inter(fontSize: 13, color: colorScheme.primary, fontWeight: FontWeight.w600)),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: Checkbox(
+                                          value: _rememberMe,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _rememberMe = value ?? false;
+                                            });
+                                          },
+                                          activeColor: colorScheme.primary,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text('Lembrar', style: GoogleFonts.inter(fontSize: 13, color: subtitleColor)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(colors: [colorScheme.primary, colorScheme.secondary]),
+                                        borderRadius: BorderRadius.circular(30),
+                                        boxShadow: [
+                                          BoxShadow(color: colorScheme.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))
+                                        ],
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: isLoading ? null : _login,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                        ),
+                                        child: isLoading
+                                            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                            : Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text('Entrar', style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                                                  const SizedBox(width: 8),
+                                                  const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+                                                ],
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: _authenticateWithBiometrics,
+                                      icon: Icon(Icons.fingerprint_rounded, color: textColor, size: 22),
+                                      label: Text('Biometria', style: GoogleFonts.inter(color: textColor, fontWeight: FontWeight.bold, fontSize: 15)),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        side: BorderSide(color: isDark ? Colors.white24 : Colors.black12, width: 2),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.primary.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Icon(Icons.rocket_launch, color: colorScheme.primary, size: 24),
+                                      Text('Não tem conta?', style: GoogleFonts.inter(fontSize: 13, color: subtitleColor)),
+                                      TextButton(
+                                        onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
+                                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        child: Text('Criar conta', style: GoogleFonts.inter(fontSize: 13, color: colorScheme.primary, fontWeight: FontWeight.bold)),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Text('Josi Finanças', style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold, color: textColor)),
                                     ],
                                   ),
-                                if (!isDesktop) const SizedBox(height: 32),
-                                Text('Bem-vinda de volta', style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: textColor)),
-                                const SizedBox(height: 8),
-                                Text('Acesse sua conta para continuar sua jornada de stewardship financeira.', style: GoogleFonts.inter(fontSize: 16, color: subtitleColor), textAlign: isDesktop ? TextAlign.left : TextAlign.center),
-                                const SizedBox(height: 40),
-                                
-                                _buildInput(label: 'E-mail', icon: Icons.mail_outline_rounded, hint: 'exemplo@email.com', controller: _emailController, keyboardType: TextInputType.emailAddress, isDark: isDark, colorScheme: colorScheme),
-                                const SizedBox(height: 24),
-                                _buildInput(
-                                  label: 'Senha',
-                                  icon: Icons.lock_outline_rounded,
-                                  hint: '••••••••',
-                                  controller: _passwordController,
-                                  obscure: _obscurePassword,
-                                  isDark: isDark,
-                                  colorScheme: colorScheme,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: subtitleColor),
-                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                                  ),
-                                  labelExtra: TextButton(
-                                    onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
-                                    },
-                                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
-                                    child: Text('Esqueci minha senha', style: GoogleFonts.inter(fontSize: 14, color: colorScheme.primary, fontWeight: FontWeight.w600)),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Checkbox(
-                                        value: _rememberMe,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _rememberMe = value ?? false;
-                                          });
-                                        },
-                                        activeColor: colorScheme.primary,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text('Lembrar de mim', style: GoogleFonts.inter(fontSize: 14, color: subtitleColor)),
-                                  ],
-                                ),
-                                const SizedBox(height: 32),
-                                
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(colors: [colorScheme.primary, colorScheme.secondary]),
-                                      borderRadius: BorderRadius.circular(30),
-                                      boxShadow: [
-                                        BoxShadow(color: colorScheme.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))
-                                      ],
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: isLoading ? null : _login,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        padding: const EdgeInsets.symmetric(vertical: 20),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                      ),
-                                      child: isLoading
-                                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                          : Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text('Entrar', style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
-                                                const SizedBox(width: 8),
-                                                const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
-                                              ],
-                                            ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: OutlinedButton.icon(
-                                    onPressed: _authenticateWithBiometrics,
-                                    icon: Icon(Icons.fingerprint_rounded, color: textColor, size: 24),
-                                    label: Text('Entrar com Biometria', style: GoogleFonts.inter(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 20),
-                                      side: BorderSide(color: isDark ? Colors.white24 : Colors.black12, width: 2),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-                                Divider(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
-                                const SizedBox(height: 24),
-                                
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Não tem uma conta?', style: GoogleFonts.inter(fontSize: 14, color: subtitleColor)),
-                                    TextButton(
-                                      onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
-                                      child: Text('Criar conta', style: GoogleFonts.inter(fontSize: 14, color: colorScheme.primary, fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                Center(
-                                  child: Text('© 2026 Josi Finanças. Todos os direitos reservados.', style: GoogleFonts.inter(fontSize: 12, color: isDark ? Colors.white38 : const Color(0xFF94A3B8))),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -403,16 +408,16 @@ class _LoginScreenState extends State<LoginScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: labelColor)),
+            Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: labelColor)),
             if (labelExtra != null) labelExtra,
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         TextField(
           controller: controller,
           obscureText: obscure,
           keyboardType: keyboardType,
-          style: GoogleFonts.inter(fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+          style: GoogleFonts.inter(fontSize: 15, color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.inter(color: isDark ? Colors.white38 : const Color(0xFF94A3B8)),
@@ -420,8 +425,10 @@ class _LoginScreenState extends State<LoginScreen> {
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: filledColor,
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: borderColor)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: colorScheme.primary, width: 2)),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: borderColor)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: colorScheme.primary, width: 2)),
           ),
         ),
       ],

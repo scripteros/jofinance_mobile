@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.mobap.jo_finance_app_flutter"
+    namespace = "br.com.mobap.jo_finance"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "br.com.mobap.jo_finance_app_flutter"
+        applicationId = "br.com.mobap.jo_finance"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
