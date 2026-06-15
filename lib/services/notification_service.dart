@@ -46,9 +46,12 @@ class NotificationService {
       sound: true,
     );
 
-    // Obter token FCM
+    // Obter token FCM e registrar no backend
     _fcmToken = await _fcm.getToken();
     _saveTokenLocally(_fcmToken);
+    if (_fcmToken != null) {
+      _registerTokenWithBackend(_fcmToken!);
+    }
 
     // Escutar renovação de token
     _fcm.onTokenRefresh.listen((newToken) {
