@@ -29,7 +29,8 @@ class MentoriaTabState extends State<MentoriaTab> {
   final _audioRecorder = AudioRecorder();
   final _audioPlayer = AudioPlayer();
   bool _isRecording = false;
-  bool _isLoading = false;
+  bool _isSending = false;   // true enquanto aguarda resposta da API
+  bool _isLoadingHistory = true;  // true enquanto carrega histórico inicial
   bool _isAudioLoading = false;
   String? _playingId;
 
@@ -61,7 +62,7 @@ class MentoriaTabState extends State<MentoriaTab> {
   }
 
   Future<void> _loadHistory() async {
-    setState(() => _isLoading = true);
+    setState(() => _isLoadingHistory = true);
     try {
       final history = await _apiService.getChatHistory();
       final List<Map<String, dynamic>> loaded = [];
@@ -90,7 +91,7 @@ class MentoriaTabState extends State<MentoriaTab> {
     } catch (e) {
       print('Erro ao carregar historico: $e');
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _isLoadingHistory = false);
     }
   }
 
@@ -118,7 +119,7 @@ class MentoriaTabState extends State<MentoriaTab> {
     setState(() {
       _messages.insert(0, userMsg);
       _controller.clear();
-      _isLoading = true;
+      _isSending = true;
     });
     _scrollToBottom();
 
@@ -150,7 +151,7 @@ class MentoriaTabState extends State<MentoriaTab> {
         });
       });
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _isSending = false);
     }
   }
 
@@ -386,7 +387,7 @@ class MentoriaTabState extends State<MentoriaTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Josi (Mentora)', style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text(_isAudioLoading ? 'transcrevendo áudio...' : (_isLoading ? 'digitando...' : 'online'), style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
+                Text(_isAudioLoading ? 'transcrevendo áudio...' : (_isSending ? 'digitando...' : 'online'), style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.white.withValues(alpha: 0.8))),
               ],
             ),
           ],
@@ -409,129 +410,126 @@ class MentoriaTabState extends State<MentoriaTab> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              reverse: true,
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
-              itemCount: _messages.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (_isLoading && index == 0) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 16, right: 60, left: 16),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          const SizedBox(width: 8),
-                          Text('Josi está digitando...', style: GoogleFonts.plusJakartaSans(fontSize: 14, color: Colors.grey)),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-                
-                final msgIndex = _isLoading ? index - 1 : index;
-                final msg = _messages[msgIndex];
-                final isUser = msg['isUser'];
+            child: _isLoadingHistory
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF10B981)),
+                  )
+                : _messages.isEmpty
+                    ? _buildEmptyState()
+                    : RefreshIndicator(
+                        onRefresh: _loadHistory,
+                        color: const Color(0xFF10B981),
+                        backgroundColor: const Color(0xFF1A1A2E),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          reverse: true,
+                          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                          itemCount: _messages.length,
+                          itemBuilder: (context, index) {
+                            final msg = _messages[index];
+                            final isUser = msg['isUser'] as bool;
+                            final isSelected = _selectedMessages.contains(msg['id']);
 
-                final isSelected = _selectedMessages.contains(msg['id']);
-
-                return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onLongPress: () => _toggleSelection(msg['id']),
-                  onTap: () {
-                    if (_isSelectionMode) _toggleSelection(msg['id']);
-                  },
-                  child: Container(
-                    color: isSelected ? _primary.withValues(alpha: 0.2) : Colors.transparent,
-                    padding: const EdgeInsets.only(bottom: 12, top: 4, left: 16, right: 16),
-                    child: Row(
-                      mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (!isUser) ...[
-                          CircleAvatar(
-                            radius: 14,
-                            backgroundColor: _primary,
-                            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        Flexible(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: isUser ? _userBubble : _joBubble,
-                              borderRadius: BorderRadius.only(
-                                topLeft: const Radius.circular(20),
-                                topRight: const Radius.circular(20),
-                                bottomLeft: Radius.circular(isUser ? 20 : 4),
-                                bottomRight: Radius.circular(isUser ? 4 : 20),
-                              ),
-                              boxShadow: [
-                                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                              children: [
-                                if (isUser)
-                                  Text(msg['text'], style: GoogleFonts.plusJakartaSans(fontSize: 15, color: Colors.black87, height: 1.4))
-                                else
-                                  RichText(
-                                    text: TextSpan(
-                                      style: GoogleFonts.plusJakartaSans(fontSize: 15, color: Colors.black87, height: 1.4),
-                                      children: _colorizeText(msg['text']),
-                                    ),
-                                  ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onLongPress: () => _toggleSelection(msg['id']),
+                              onTap: () {
+                                if (_isSelectionMode) _toggleSelection(msg['id']);
+                              },
+                              child: Container(
+                                color: isSelected ? _primary.withValues(alpha: 0.2) : Colors.transparent,
+                                padding: const EdgeInsets.only(bottom: 12, top: 4, left: 16, right: 16),
+                                child: Row(
+                                  mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     if (!isUser) ...[
-                                      GestureDetector(
-                                        onTap: () => _playTTS(msg['text'], msg['id']),
-                                        child: Icon(
-                                          _playingId == msg['id'] ? Icons.volume_up : Icons.volume_up_outlined,
-                                          size: 16,
-                                          color: _playingId == msg['id'] ? _primary : Colors.grey,
-                                        ),
+                                      CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor: _primary,
+                                        child: const Icon(Icons.auto_awesome, color: Colors.white, size: 14),
                                       ),
                                       const SizedBox(width: 8),
                                     ],
-                                    Text(msg['time'], style: GoogleFonts.plusJakartaSans(fontSize: 10, color: Colors.grey.shade500)),
-                                    if (isUser) ...[
-                                      const SizedBox(width: 4),
-                                      Icon(Icons.done_all, size: 14, color: Colors.blue.shade400),
-                                    ]
+                                    Flexible(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: isUser ? _userBubble : _joBubble,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: const Radius.circular(20),
+                                            topRight: const Radius.circular(20),
+                                            bottomLeft: Radius.circular(isUser ? 20 : 4),
+                                            bottomRight: Radius.circular(isUser ? 4 : 20),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                          children: [
+                                            if (isUser)
+                                              Text(msg['text']?.toString() ?? '', style: GoogleFonts.plusJakartaSans(fontSize: 15, color: Colors.black87, height: 1.4))
+                                            else
+                                              RichText(
+                                                text: TextSpan(
+                                                  style: GoogleFonts.plusJakartaSans(fontSize: 15, color: Colors.black87, height: 1.4),
+                                                  children: _colorizeText(msg['text']?.toString() ?? ''),
+                                                ),
+                                              ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (!isUser) ...[
+                                                  GestureDetector(
+                                                    onTap: () => _playTTS(msg['text']?.toString() ?? '', msg['id']),
+                                                    child: Icon(
+                                                      _playingId == msg['id'] ? Icons.volume_up : Icons.volume_up_outlined,
+                                                      size: 16,
+                                                      color: _playingId == msg['id'] ? _primary : Colors.grey,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                ],
+                                                Text(msg['time']?.toString() ?? '', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: Colors.grey.shade500)),
+                                                if (isUser) ...[
+                                                  const SizedBox(width: 4),
+                                                  Icon(Icons.done_all, size: 14, color: Colors.blue.shade400),
+                                                ]
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    if (isUser) const SizedBox(width: 24),
                                   ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         ),
-                        if (isUser) const SizedBox(width: 24),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
           ),
           
-          // Remove loading indicator since it's in the list now
+          // Indicador de "digitando..." perto do input
+          if (_isSending)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF10B981)),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('Josi está digitando...', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
           if (_isAudioLoading)
              const Padding(padding: EdgeInsets.all(8.0), child: LinearProgressIndicator()),
 
