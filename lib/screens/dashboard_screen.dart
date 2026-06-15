@@ -93,6 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         api.getNetWorth().catchError((_) => <String, dynamic>{}),
         api.getUpcomingBills().catchError((_) => []),
         api.getChatHistory().catchError((_) => []),
+        api.getNotifications().catchError((_) => []),
       ]);
 
       final txData = results[0] as List<Transaction>;
@@ -101,8 +102,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final netWorthData = results[3] as Map<String, dynamic>;
       final billsData = results[4] as List<dynamic>;
       final chatHistory = results[5] as List<dynamic>;
+      final rawNotifications = results[6] as List<dynamic>;
 
-      int notifCount = chatHistory.where((msg) => msg['is_user'] == false).length;
+      int notifCount = rawNotifications.where((n) {
+        final isRead = n['is_read'] == true || n['read'] == true;
+        return !isRead;
+      }).length;
 
       double parseDouble(dynamic val) {
         if (val is num) return val.toDouble();

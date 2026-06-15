@@ -268,6 +268,16 @@ class ApiService {
     throw Exception('Falha ao transcrever áudio');
   }
 
+  // --- User Notifications ---
+
+  Future<List<dynamic>> getNotifications() async {
+    return await _request('/user/notifications');
+  }
+
+  Future<void> deleteNotification(int id) async {
+    await _request('/user/notifications/$id', method: 'DELETE');
+  }
+
   // --- Account Management ---
 
   Future<Map<String, dynamic>> resetUserData() async {
