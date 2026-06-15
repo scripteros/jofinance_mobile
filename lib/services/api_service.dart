@@ -287,4 +287,19 @@ class ApiService {
     if (response.statusCode == 200) return jsonDecode(response.body);
     throw Exception('Falha ao obter planos');
   }
+
+  // --- FCM Push Notifications ---
+
+  Future<Map<String, dynamic>> fcmRegister(String token, String platform) async {
+    return await _request('/fcm/register', method: 'POST', body: {
+      'token': token,
+      'platform': platform,
+    });
+  }
+
+  Future<Map<String, dynamic>> fcmUnregister(String token) async {
+    return await _request('/fcm/unregister', method: 'POST', body: {
+      'token': token,
+    });
+  }
 }

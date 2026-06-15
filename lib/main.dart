@@ -8,8 +8,10 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/intro_screen.dart';
+import 'services/notification_service.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
@@ -49,8 +51,28 @@ class JoFinanceApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _initNotifications();
+  }
+
+  Future<void> _initNotifications() async {
+    try {
+      await NotificationService().initialize();
+    } catch (e) {
+      print('⚠️ Firebase não configurado: $e');
+      print('   Ignorar se o Firebase Console ainda não foi configurado.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +91,11 @@ class AuthWrapper extends StatelessWidget {
           return const IntroScreen();
         }
 
+        // Registrar token FCM após login
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _registerFcmToken();
+        });
+
         // Se estiver autenticado, verificar onboarding
         if (auth.user?.onboardingDone == false) {
           return const OnboardingScreen();
@@ -77,5 +104,16 @@ class AuthWrapper extends StatelessWidget {
         return const DashboardScreen();
       },
     );
+  }
+
+  Future<void> _registerFcmToken() async {
+    try {
+      final notif = NotificationService();
+      if (notif.token != null) {
+        await notif.registerWithBackend(platform: 'android');
+      }
+    } catch (e) {
+      print('⚠️ Erro ao registrar FCM token após login: $e');
+    }
   }
 }
